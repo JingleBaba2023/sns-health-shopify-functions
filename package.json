@@ -1,0 +1,20 @@
+{
+  "name": "sns-health-shopify-functions",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/JingleBaba2023/sns-health-shopify-functions.git",
+  "author": "JingleBaba <umesh@shoptrade.co>",
+  "license": "MIT",
+  "dependencies": {
+    "@shopify/app": "^3.51.0",
+    "@shopify/cli": "^3.51.0",
+    "@shopify/shopify_function": "0.1.0",
+    "javy": "0.1.1"
+  },
+  "scripts": {
+    "initApp": "shopify app generate extension --template product_discounts --name product-discount",
+    "dev": "shopify app dev",
+    "typegen": "shopify app function typegen --path=extensions/product-discount",
+    "configPush": "shopify app config push"
+  }
+}
