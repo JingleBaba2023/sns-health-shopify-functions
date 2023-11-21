@@ -23,20 +23,98 @@ const EMPTY_DISCOUNT = {
 * @returns {FunctionRunResult}
 */
 export function run(input) {
+  const discounts = {
+    "tier": {
+      "message": "Free Product Discount",
+      "percentage": 100
+      },
+    "BuymoreSaveMore": {
+      "message": "Buy More Save More Discount",
+      "percentage": {
+        "3":5,
+        "5": 10 
+      }
+    },
+    "frequentlyBoughtTogether": {
+     "message": "Frequently Bought Together Discount", 
+     "percentage": 5
+   }
+  }
+
   const targets = input.cart.lines
   // Only include cart lines with a quantity of two or more
   // and a targetable product variant
-  .filter(line => line.quantity >= 2 &&
+  .filter(line => 
+   line.source && line.source.value == "Rebuy" &&
     line.merchandise.__typename == "ProductVariant")
   .map(line => {
     const variant = /** @type {ProductVariant} */ (line.merchandise);
-    return /** @type {Target} */ ({
-      // Use the variant ID to create a discount target
+    const attribution =  (line.attribution && line.attribution.value) || '';
+    return { 
+      attribution,
       productVariant: {
         id: variant.id
       }
-    });
+    }
   });
+
+  const discountProductHasMap = {
+    tier: {
+      targets: [],
+      message: discounts.tier.message, 
+      value: {
+        percentage: {
+          value: discounts.tier.percentage
+        }
+      }
+    },
+    BuymoreSaveMore: {
+      targets: [],
+      message: discounts.BuymoreSaveMore.message, 
+      value: {
+        percentage: {
+          value: discounts.BuymoreSaveMore.percentage
+        }
+      }
+    },
+    frequentlyBoughtTogether: {
+      targets: [],
+      message: discounts.frequentlyBoughtTogether.message, 
+      value: {
+        percentage: {
+          value: discounts.frequentlyBoughtTogether.percentage
+        }
+      }
+    }
+  }
+
+
+
+  for(let index = 0 ; index<targets.length; index++) {
+    const {attribution = '', productVariant} = targets[index];
+    if(attribution && attribution == "Rebuy Tiered Progress Bar") {
+      // @ts-ignore
+      discountProductHasMap.tier.targets.push({
+        productVariant
+      })
+    }
+    if(attribution && attribution == "Rebuy Dynamic Product Bundle") {
+      // @ts-ignore
+      discountProductHasMap.frequentlyBoughtTogether.targets.push({
+        productVariant
+      })
+    }
+  }
+
+
+  const getDiscountedProductsWithTypes = Object.values(discountProductHasMap).filter((discountType)=>{
+   if(discountType.targets.length) {
+    return discountType;
+   }
+  })
+
+
+
 
   if (!targets.length) {
     // You can use STDERR for debug logs in your function
@@ -47,19 +125,7 @@ export function run(input) {
   // The @shopify/shopify_function package applies JSON.stringify() to your function result
   // and writes it to STDOUT
   return {
-    discounts: [
-      {
-        // Apply the discount to the collected targets
-        targets,
-        message: "10% off",
-        // Define a percentage-based discount
-        value: {
-          percentage: {
-            value: "10.0"
-          }
-        }
-      }
-    ],
+    discounts: getDiscountedProductsWithTypes,
     discountApplicationStrategy: DiscountApplicationStrategy.First
   };
 };

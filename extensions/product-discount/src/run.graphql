@@ -2,6 +2,12 @@ query RunInput {
   cart {
     lines {
       quantity
+      source: attribute(key: "_source") {
+        value
+      },
+      attribution: attribute(key: "_attribution") {
+        value
+      }
       merchandise {
         __typename
         ...on ProductVariant {
