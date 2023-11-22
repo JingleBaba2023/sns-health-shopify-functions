@@ -31,8 +31,8 @@ export function run(input) {
     "BuymoreSaveMore": {
       "message": "Buy More Save More Discount",
       "percentage": {
-        "3":5,
-        "5": 10 
+        "first":5,
+        "second": 10 
       }
     },
     "frequentlyBoughtTogether": {
@@ -40,6 +40,8 @@ export function run(input) {
      "percentage": 5
    }
   }
+
+  const globalMessage = "Discount Applied!!";
 
   const targets = input.cart.lines
   // Only include cart lines with a quantity of two or more
@@ -61,7 +63,7 @@ export function run(input) {
   const discountProductHasMap = {
     tier: {
       targets: [],
-      message: discounts.tier.message, 
+      message: globalMessage, 
       value: {
         percentage: {
           value: discounts.tier.percentage
@@ -70,16 +72,16 @@ export function run(input) {
     },
     BuymoreSaveMore: {
       targets: [],
-      message: discounts.BuymoreSaveMore.message, 
+      message: globalMessage, 
       value: {
         percentage: {
-          value: discounts.BuymoreSaveMore.percentage
+          value: discounts.BuymoreSaveMore.percentage.first
         }
       }
     },
     frequentlyBoughtTogether: {
       targets: [],
-      message: discounts.frequentlyBoughtTogether.message, 
+      message: globalMessage, 
       value: {
         percentage: {
           value: discounts.frequentlyBoughtTogether.percentage
@@ -88,17 +90,21 @@ export function run(input) {
     }
   }
 
-
-
   for(let index = 0 ; index<targets.length; index++) {
     const {attribution = '', productVariant} = targets[index];
     if(attribution && attribution == "Rebuy Tiered Progress Bar") {
       // @ts-ignore
       discountProductHasMap.tier.targets.push({
-        productVariant
+        productVariant: {...productVariant, quantity:1}
       })
     }
     if(attribution && attribution == "Rebuy Dynamic Product Bundle") {
+      // @ts-ignore
+      discountProductHasMap.frequentlyBoughtTogether.targets.push({
+        productVariant: {...productVariant, quantity:1}
+      })
+    }
+    if(attribution && attribution == "Rebuy Buy More Save More") {
       // @ts-ignore
       discountProductHasMap.frequentlyBoughtTogether.targets.push({
         productVariant
@@ -106,15 +112,24 @@ export function run(input) {
     }
   }
 
+  let {BuymoreSaveMore:{targets:BuymoreSaveMoreItems,value: {percentage:{value:percentageValue}}}} = discountProductHasMap || {}; 
+  const {BuymoreSaveMore:{percentage:BuymoreSaveMorePercentage}} = discounts;
+
+  if(BuymoreSaveMoreItems && BuymoreSaveMoreItems.length >= 2) {
+    percentageValue = BuymoreSaveMorePercentage["first"];
+  }
+  else if(BuymoreSaveMoreItems && BuymoreSaveMoreItems.length >= 5) {
+    percentageValue = BuymoreSaveMorePercentage["second"];
+  }
+  else {
+    BuymoreSaveMoreItems = [];
+  }
 
   const getDiscountedProductsWithTypes = Object.values(discountProductHasMap).filter((discountType)=>{
    if(discountType.targets.length) {
     return discountType;
    }
   })
-
-
-
 
   if (!targets.length) {
     // You can use STDERR for debug logs in your function
@@ -126,6 +141,6 @@ export function run(input) {
   // and writes it to STDOUT
   return {
     discounts: getDiscountedProductsWithTypes,
-    discountApplicationStrategy: DiscountApplicationStrategy.First
+    discountApplicationStrategy: DiscountApplicationStrategy.All
   };
 };

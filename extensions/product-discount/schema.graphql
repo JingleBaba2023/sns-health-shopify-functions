@@ -2674,6 +2674,11 @@ enum DiscountApplicationStrategy {
   Only apply the discount that offers the maximum reduction.
   """
   MAXIMUM
+
+  """
+  Only apply the discount that offers the maximum reduction.
+  """
+  ALL
 }
 
 """
