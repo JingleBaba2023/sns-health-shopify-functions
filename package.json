@@ -14,6 +14,7 @@
   "scripts": {
     "initApp": "shopify app generate extension --template product_discounts --name product-discount",
     "dev": "shopify app dev",
+    "deploy": "shopify app deploy",
     "typegen": "shopify app function typegen --path=extensions/product-discount",
     "configPush": "shopify app config push",
     "updateSchema": "shopify app function schema --path=extensions/product-discount"
