@@ -95,7 +95,7 @@ export function run(input) {
     if(attribution && attribution == "Rebuy Tiered Progress Bar") {
       // @ts-ignore
       discountProductHasMap.tier.targets.push({
-        productVariant: {...productVariant, quantity:1}
+        productVariant: {...productVariant}
       })
     }
     if(attribution && attribution == "Rebuy Dynamic Product Bundle") {
