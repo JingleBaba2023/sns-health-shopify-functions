@@ -115,7 +115,7 @@ export function run(input) {
   let {BuymoreSaveMore:{targets:BuymoreSaveMoreItems,value: {percentage:{value:percentageValue}}}} = discountProductHasMap || {}; 
   const {BuymoreSaveMore:{percentage:BuymoreSaveMorePercentage}} = discounts;
 
-  if(BuymoreSaveMoreItems && BuymoreSaveMoreItems.length >= 2) {
+  if(BuymoreSaveMoreItems && BuymoreSaveMoreItems.length >= 3) {
     percentageValue = BuymoreSaveMorePercentage["first"];
   }
   else if(BuymoreSaveMoreItems && BuymoreSaveMoreItems.length >= 5) {
@@ -124,6 +124,11 @@ export function run(input) {
   else {
     BuymoreSaveMoreItems = [];
   }
+
+ let {frequentlyBoughtTogether:{target:frequentlyBoughtTogetherItems}} =  discountProductHasMap || {};
+ if(frequentlyBoughtTogetherItems.length < 3) {
+  frequentlyBoughtTogetherItems = []
+ }
 
   const getDiscountedProductsWithTypes = Object.values(discountProductHasMap).filter((discountType)=>{
    if(discountType.targets.length) {
