@@ -52,7 +52,9 @@ export function run(input) {
   .map(line => {
     const variant = /** @type {ProductVariant} */ (line.merchandise);
     const attribution =  (line.attribution && line.attribution.value) || '';
+    const quantity = line.quantity;
     return { 
+      quantity,
       attribution,
       productVariant: {
         id: variant.id
@@ -72,6 +74,7 @@ export function run(input) {
     },
     BuymoreSaveMore: {
       targets: [],
+      quantity: 1,
       message: globalMessage, 
       value: {
         percentage: {
@@ -91,7 +94,7 @@ export function run(input) {
   }
 
   for(let index = 0 ; index<targets.length; index++) {
-    const {attribution = '', productVariant} = targets[index];
+    const {attribution = '', productVariant, quantity} = targets[index];
     if(attribution && attribution == "Rebuy Tiered Progress Bar") {
       // @ts-ignore
       discountProductHasMap.tier.targets.push({
@@ -106,23 +109,23 @@ export function run(input) {
     }
     if(attribution && attribution == "Rebuy Buy More Save More") {
       // @ts-ignore
-      discountProductHasMap.frequentlyBoughtTogether.targets.push({
+      discountProductHasMap.BuymoreSaveMore.targets.push({
         productVariant
       })
+      discountProductHasMap.BuymoreSaveMore.quantity = quantity;
     }
   }
 
-  let {BuymoreSaveMore:{targets:BuymoreSaveMoreItems,value: {percentage:{value:percentageValue}}}} = discountProductHasMap || {}; 
+  const {BuymoreSaveMore} =  discountProductHasMap || {};
   const {BuymoreSaveMore:{percentage:BuymoreSaveMorePercentage}} = discounts;
-
-  if(BuymoreSaveMoreItems && BuymoreSaveMoreItems.length >= 3) {
-    percentageValue = BuymoreSaveMorePercentage["first"];
+  if(BuymoreSaveMore.quantity >= 3) {
+    BuymoreSaveMore.value.percentage.value = BuymoreSaveMorePercentage["first"];
   }
-  else if(BuymoreSaveMoreItems && BuymoreSaveMoreItems.length >= 5) {
-    percentageValue = BuymoreSaveMorePercentage["second"];
+  if(BuymoreSaveMore.quantity >= 5) {
+    BuymoreSaveMore.value.percentage.value = BuymoreSaveMorePercentage["second"];
   }
-  else {
-    BuymoreSaveMoreItems = [];
+  if(BuymoreSaveMore.quantity < 3) {
+    BuymoreSaveMore.targets = [];
   }
 
  let {frequentlyBoughtTogether} =  discountProductHasMap || {};
@@ -132,9 +135,12 @@ export function run(input) {
 
   const getDiscountedProductsWithTypes = Object.values(discountProductHasMap).filter((discountType)=>{
    if(discountType.targets.length) {
+    delete discountType.quantity;
     return discountType;
    }
   })
+
+  console.error({...discountProductHasMap});
 
   if (!targets.length) {
     // You can use STDERR for debug logs in your function
