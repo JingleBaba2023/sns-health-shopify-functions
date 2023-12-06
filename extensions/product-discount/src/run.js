@@ -125,9 +125,9 @@ export function run(input) {
     BuymoreSaveMoreItems = [];
   }
 
- let {frequentlyBoughtTogether:{target:frequentlyBoughtTogetherItems}} =  discountProductHasMap || {};
- if(frequentlyBoughtTogetherItems.length < 3) {
-  frequentlyBoughtTogetherItems = []
+ let {frequentlyBoughtTogether} =  discountProductHasMap || {};
+ if(frequentlyBoughtTogether.targets.length < 3) {
+  frequentlyBoughtTogether.targets = []
  }
 
   const getDiscountedProductsWithTypes = Object.values(discountProductHasMap).filter((discountType)=>{
