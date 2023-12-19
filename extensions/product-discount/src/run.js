@@ -38,7 +38,11 @@ export function run(input) {
     "frequentlyBoughtTogether": {
      "message": "Frequently Bought Together Discount", 
      "percentage": 5
-   }
+   },
+   "prePurchaseUpsells": {
+    "message": "Pre Purchase Upsell Discount", 
+    "percentage": 50
+  }
   }
 
   const globalMessage = "Discount Applied!!";
@@ -90,7 +94,16 @@ export function run(input) {
           value: discounts.frequentlyBoughtTogether.percentage
         }
       }
-    }
+    },
+    prePurchaseUpsells: {
+      targets: [],
+      message: globalMessage, 
+      value: {
+        percentage: {
+          value: discounts.prePurchaseUpsells.percentage
+        }
+      }
+    },
   }
 
   for(let index = 0 ; index<targets.length; index++) {
@@ -113,6 +126,13 @@ export function run(input) {
         productVariant
       })
       discountProductHasMap.BuymoreSaveMore.quantity = quantity;
+    }
+
+    if(attribution && attribution == "Rebuy Pre-Purchase Product") {
+      // @ts-ignore
+      discountProductHasMap.prePurchaseUpsells.targets.push({
+        productVariant: {...productVariant, quantity:1}
+      })
     }
   }
 
