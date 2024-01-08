@@ -32,12 +32,14 @@ export function run(input) {
       "message": "Buy More Save More Discount",
       "percentage": {
         "first":5,
-        "second": 10 
+        "second": 10,
+        "third": 15
+
       }
     },
     "frequentlyBoughtTogether": {
      "message": "Frequently Bought Together Discount", 
-     "percentage": 5
+     "percentage": 10
    },
    "prePurchaseUpsells": {
     "message": "Pre Purchase Upsell Discount", 
@@ -138,13 +140,16 @@ export function run(input) {
 
   const {BuymoreSaveMore} =  discountProductHasMap || {};
   const {BuymoreSaveMore:{percentage:BuymoreSaveMorePercentage}} = discounts;
-  if(BuymoreSaveMore.quantity >= 3) {
+  if(BuymoreSaveMore.quantity >= 2) {
     BuymoreSaveMore.value.percentage.value = BuymoreSaveMorePercentage["first"];
   }
-  if(BuymoreSaveMore.quantity >= 5) {
+  if(BuymoreSaveMore.quantity >= 3) {
     BuymoreSaveMore.value.percentage.value = BuymoreSaveMorePercentage["second"];
   }
-  if(BuymoreSaveMore.quantity < 3) {
+  if(BuymoreSaveMore.quantity >= 5) {
+    BuymoreSaveMore.value.percentage.value = BuymoreSaveMorePercentage["third"];
+  }
+  if(BuymoreSaveMore.quantity < 2) {
     BuymoreSaveMore.targets = [];
   }
 
